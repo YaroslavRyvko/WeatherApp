@@ -1,6 +1,19 @@
-import { initializeApp } from 'firebase/app'; 
-import { getDatabase, set, ref, update } from "firebase/database"; 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, } from "firebase/auth";
+import {
+    initializeApp
+} from 'firebase/app';
+import {
+    getDatabase,
+    set,
+    ref,
+    update
+} from "firebase/database";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+} from "firebase/auth";
 
 export function initFirebase() {
     const firebaseConfig = {
@@ -68,7 +81,7 @@ export function initFirebase() {
                     const errorMessage = error.message;
                     signinForm.querySelector('.error').textContent = errorMessage;
                 });
-                
+
             signinForm.password.value = '';
         });
     }
@@ -93,11 +106,11 @@ export function initFirebase() {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             if (window.location.href.includes('/auth.html')) {
-                window.location.replace("/index.html");
+                window.location.replace(window.location.host + "/index.html");
             }
         } else {
             if (!window.location.href.includes('auth.html')) {
-                window.location.replace("/auth.html");
+                window.location.replace(window.location.host + "/auth.html");
             }
         }
     });
@@ -108,7 +121,7 @@ export function initFirebase() {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             signOut(auth).then(() => {
-                window.location.replace("/auth.html");
+                window.location.replace(window.location.host + "/auth.html");
             }).catch((error) => {
                 const errorMessage = error.message;
             });
