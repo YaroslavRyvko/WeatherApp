@@ -1,19 +1,6 @@
-import {
-    initializeApp
-} from 'firebase/app';
-import {
-    getDatabase,
-    set,
-    ref,
-    update
-} from "firebase/database";
-import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut,
-} from "firebase/auth";
+import { initializeApp } from 'firebase/app'; 
+import { getDatabase, set, ref, update } from "firebase/database"; 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, } from "firebase/auth";
 
 export function initFirebase() {
     const firebaseConfig = {
@@ -81,7 +68,7 @@ export function initFirebase() {
                     const errorMessage = error.message;
                     signinForm.querySelector('.error').textContent = errorMessage;
                 });
-
+                
             signinForm.password.value = '';
         });
     }
@@ -102,15 +89,19 @@ export function initFirebase() {
         })
     }
 
+    //Initialize Path
+    let path = window.location.href;
+    let newPath = path.slice(0,path.lastIndexOf('/'));
+
     //Auth State
     onAuthStateChanged(auth, (user) => {
         if (user) {
             if (window.location.href.includes('/auth.html')) {
-                window.location.replace(window.location.host + "/index.html");
+                window.location.replace(newPath + "/index.html");
             }
         } else {
             if (!window.location.href.includes('auth.html')) {
-                window.location.replace(window.location.host + "/auth.html");
+                window.location.replace(newPath + "/auth.html");
             }
         }
     });
@@ -121,7 +112,7 @@ export function initFirebase() {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             signOut(auth).then(() => {
-                window.location.replace(window.location.host + "/auth.html");
+                window.location.replace(newPath + "/auth.html");
             }).catch((error) => {
                 const errorMessage = error.message;
             });

@@ -10,7 +10,7 @@ export function initOpenWeather() {
     function fetchWeatherRandom() {
         let arr = getMultipleRandom(cities, 3);
         arr.forEach((city) => {
-            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${units}&lang=${lang}`)
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${units}&lang=${lang}`)
                 .then((resp) => {
                     if (!resp.ok) throw new Error(resp.statusText);
                     return resp.json();
@@ -39,7 +39,7 @@ export function initOpenWeather() {
         cityWrapper.innerHTML = '';
         let city = document.querySelector('.search-input').value;
         if (city) {
-            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${units}&lang=${lang}`)
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${units}&lang=${lang}`)
                 .then((resp) => {
                     if (!resp.ok) throw new Error(resp.statusText);
                     return resp.json();
@@ -83,7 +83,7 @@ export function initOpenWeather() {
 
     // Get detailed weather information
     function fetchDetailedWeather(city) {
-        fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${units}&lang=${lang}`)
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=${units}&lang=${lang}`)
             .then((resp) => {
                 if (!resp.ok) throw new Error(resp.statusText);
                 return resp.json();
@@ -91,7 +91,7 @@ export function initOpenWeather() {
             .then((data) => {
                 let lat = data.coord.lat;
                 let lon = data.coord.lon;
-                return fetch(`http://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${key}&units=${units}&lang=${lang}`);
+                return fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${key}&units=${units}&lang=${lang}`);
             })
             .then((resp) => {
                 if (!resp.ok) throw new Error(resp.statusText);
