@@ -11,9 +11,22 @@
     align-items: center;
   }
 
-  .logo {
+  &__logo {
     width: 100px;
     height: 100px;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+  }
+
+  .profile-link {
+    width: 40px;
+    height: 40px;
+    display: block;
+    flex-shrink: 0;
   }
 
   .btn-logout {
@@ -26,8 +39,7 @@
     border-radius: 2px;
     height: 50px;
     text-align: center;
-    max-width: 200px;
-    width: 100%;
+    width: 200px;
     transition: all 0.3s ease-in-out;
 
     &:hover {
@@ -41,7 +53,7 @@
 @media screen and (max-width: 768px) {
   .header {
     padding: 20px;
-    .logo {
+    &__logo {
       width: 60px;
       height: 60px;
     }

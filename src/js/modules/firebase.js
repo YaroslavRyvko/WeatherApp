@@ -1,6 +1,28 @@
-import { initializeApp } from 'firebase/app'; 
-import { getDatabase, set, ref, update } from "firebase/database"; 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, } from "firebase/auth";
+import {
+    initializeApp
+} from 'firebase/app';
+import {
+    getDatabase,
+    set,
+    ref as ref_database,
+    get,
+    child,
+    update
+} from "firebase/database";
+import {
+    getAuth,
+    updateEmail,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    updatePassword,
+    signOut,
+} from "firebase/auth";
+import {
+    getStorage,
+    ref as ref_storage,
+    uploadBytes 
+} from "firebase/storage";
 
 export function initFirebase() {
     const firebaseConfig = {
@@ -22,19 +44,21 @@ export function initFirebase() {
     //Initialize Forms
     const signUpForm = document.forms.signUpForm;
     const signinForm = document.forms.signInForm;
+    const profileForm = document.forms.profileForm;
+
 
     if (signUpForm) {
         signUpForm.submitBtn.addEventListener("click", (e) => {
             e.preventDefault();
             let email = signUpForm.email.value;
             let password = signUpForm.password.value;
-            validation(signUpForm, email, password)
+            validation(signUpForm, email, password);
 
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-
-                    set(ref(database, "users/" + user.uid), {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    set(ref_database(database, "users/" + user.uid), {
                         email: email,
                         password: password,
                     });
@@ -53,22 +77,18 @@ export function initFirebase() {
             e.preventDefault();
             let email = signinForm.email.value;
             let password = signinForm.password.value;
-            validation(signinForm, email, password)
+            validation(signinForm, email, password);
 
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    const dt = new Date();
-
-                    update(ref(database, 'users/' + user.uid), {
-                        last_login: dt,
-                    })
+                    localStorage.setItem('currentUser', JSON.stringify(user));
                 })
                 .catch((error) => {
                     const errorMessage = error.message;
                     signinForm.querySelector('.error').textContent = errorMessage;
                 });
-                
+
             signinForm.password.value = '';
         });
     }
@@ -89,18 +109,86 @@ export function initFirebase() {
         })
     }
 
+    if (profileForm) {
+        profileForm.submitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            let file = profileForm.file.files[0];
+            let email = profileForm.email.value;
+            let password = profileForm.password.value;
+            let name = profileForm.name.value;
+            let sureName = profileForm.sureName.value;
+            let user = JSON.parse(localStorage.getItem('currentUser'));
+
+
+            update(ref_database(database, 'users/' + user.uid), {
+                email: email,
+                password: password,
+                name: name,
+                sureName: sureName,
+            })
+
+            uploadImage(file);
+
+            updateEmail(auth.currentUser, email).then(() => {
+                console.log('email success');
+            }).catch((error) => {
+                console.log(error);
+            });
+
+            // updatePassword(auth.currentUser, password).then(() => {
+            //     console.log('password success');
+            // }).catch((error) => {
+            //     console.log(error);
+            // });
+        });
+    }
+
+    function uploadImage(newfile) {
+        const storage = getStorage();
+        const storageRef = ref_storage(storage, 'images');
+        
+        // 'file' comes from the Blob or File API
+        uploadBytes(storageRef, newfile).then((snapshot) => {
+          console.log('Uploaded a blob or file!');
+        });
+    }
+
+
+    function getUserInfo(user) {
+        const dbRef = ref_database(database);
+        get(child(dbRef, 'users/' + user.uid)).then((snapshot) => {
+            if (snapshot.exists()) {
+                initUserProfile(snapshot.val());
+            } else {
+                console.log("No data available");
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+
+    function initUserProfile(user) {
+        if (profileForm) {
+            profileForm.email.value = user.email;
+            profileForm.password.value = user.password;
+            profileForm.name.value = user.name;
+            profileForm.sureName.value = user.sureName;
+        }
+    }
+
     //Initialize Path
     let path = window.location.href;
-    let newPath = path.slice(0,path.lastIndexOf('/'));
+    let newPath = path.slice(0, path.lastIndexOf('/'));
 
-    //Auth State
+    // Auth State
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            getUserInfo(user);
             if (window.location.href.includes('/auth.html')) {
-                window.location.replace(newPath + "/index.html");
+                window.location.replace(newPath);
             }
         } else {
-            if (!window.location.href.includes('auth.html')) {
+            if (!window.location.href.includes('/auth.html')) {
                 window.location.replace(newPath + "/auth.html");
             }
         }
@@ -112,9 +200,9 @@ export function initFirebase() {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             signOut(auth).then(() => {
-                window.location.replace(newPath + "/auth.html");
+                localStorage.removeItem('currentUserId');
             }).catch((error) => {
-                const errorMessage = error.message;
+                console.log(error);
             });
         });
     }
