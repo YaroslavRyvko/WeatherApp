@@ -21,7 +21,8 @@ import {
 import {
     getStorage,
     ref as ref_storage,
-    uploadBytes 
+    uploadBytes,
+    getDownloadURL
 } from "firebase/storage";
 
 export function initFirebase() {
@@ -119,7 +120,6 @@ export function initFirebase() {
             let sureName = profileForm.sureName.value;
             let user = JSON.parse(localStorage.getItem('currentUser'));
 
-
             update(ref_database(database, 'users/' + user.uid), {
                 email: email,
                 password: password,
@@ -127,7 +127,7 @@ export function initFirebase() {
                 sureName: sureName,
             })
 
-            uploadImage(file);
+            uploadImage(file, user.uid);
 
             updateEmail(auth.currentUser, email).then(() => {
                 console.log('email success');
@@ -143,13 +143,17 @@ export function initFirebase() {
         });
     }
 
-    function uploadImage(newfile) {
+    function uploadImage(newfile, uid) {
         const storage = getStorage();
-        const storageRef = ref_storage(storage, 'images');
-        
-        // 'file' comes from the Blob or File API
+        const name = +new Date() + "-" + newfile.name;
+        const storageRef = ref_storage(storage, name);
+
         uploadBytes(storageRef, newfile).then((snapshot) => {
-          console.log('Uploaded a blob or file!');
+            getDownloadURL(snapshot.ref).then(url => {
+                update(ref_database(database, 'users/' + uid), {
+                    image: url,
+                })
+            });
         });
     }
 
@@ -173,6 +177,7 @@ export function initFirebase() {
             profileForm.password.value = user.password;
             profileForm.name.value = user.name;
             profileForm.sureName.value = user.sureName;
+            profileForm.querySelector('img').src = user.image;
         }
     }
 
