@@ -61,7 +61,7 @@ export function initFirebase() {
             e.preventDefault();
             let email = signUpForm.email.value;
             let password = signUpForm.password.value;
-            validation(signUpForm, email, password);
+            if (!validation(signUpForm, email, password)) return;
 
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -88,7 +88,7 @@ export function initFirebase() {
             e.preventDefault();
             let email = signinForm.email.value;
             let password = signinForm.password.value;
-            validation(signinForm, email, password);
+            if (!validation(signinForm, email, password)) return;
 
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -127,7 +127,7 @@ export function initFirebase() {
             let password = profileForm.password.value;
             let name = profileForm.name.value;
             let sureName = profileForm.sureName.value;
-            validation(profileForm, email, password);
+            if (!validation(profileForm, email, password)) return;
 
             get(child(dbRef, 'users/' + currentUser.uid)).then((snapshot) => {
                 if (snapshot.exists()) {
@@ -163,10 +163,12 @@ export function initFirebase() {
                     console.log("No data available");
                 }
             }).then(() => {
-                getUserInfo(currentUser.uid);
-                profileForm.querySelector('.success').textContent = 'Profile was Updated Successfully';
+                profileForm.querySelector('.success').textContent = 'Profile was updated Successfully';
+                setTimeout(() => {
+                    profileForm.querySelector('.success').textContent = ''
+                }, 3000);
             }).catch((error) => {
-                console.error(error);
+                console.log(error);
             });
 
             if (file) updateImage(file);
@@ -194,7 +196,7 @@ export function initFirebase() {
             e.preventDefault();
             let email = adminForm.email.value;
             let password = adminForm.password.value;
-            validation(adminForm, email, password);
+            if (!validation(adminForm, email, password)) return;
 
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -209,6 +211,7 @@ export function initFirebase() {
                         setTimeout(() => {
                             adminForm.querySelector('.success').textContent = ''
                         }, 3000);
+
                         Email.send({
                             Host: "smtp.elasticemail.com",
                             Username: "weatherappjs@gmail.com",
@@ -218,7 +221,7 @@ export function initFirebase() {
                             Subject: "Registration Success",
                             Body: "Congratz your account was created on https://yaroslavryvko.github.io/WeatherApp"
                         }).then(
-                            // message => alert(message)
+                            message => console.log(message)
                         );
                     });
                 })
@@ -339,16 +342,20 @@ export function initFirebase() {
     function validation(form, email, password) {
         let errors = form.querySelectorAll('.invalid');
         errors.forEach(error => error.remove());
-
+        let errorCheck = true;
         if (!email) {
             form.querySelector('.email').innerHTML += '<p class="invalid">This field is required</p>';
+            errorCheck = false;
 
         } else if (!/^\S+@\S+\.\S+$/.test(email)) {
             form.querySelector('.email').innerHTML += '<p class="invalid">Invalid email adress</p>';
+            errorCheck = false;
         }
         if (!password) {
-            form.querySelector('.password').innerHTML += '<p class="invalid">This field is required</p>';
+            form.querySelector('.password').innerHTML += '<p class="invalid">This field is required</p>'
+            errorCheck = false;
         }
+        return errorCheck;
     }
 
     //Form Togglers

@@ -204,7 +204,8 @@
     width: 100%;
     max-width: 500px;
     height: -moz-fit-content;
-    height: fit-content; }
+    height: fit-content;
+    min-height: 400px; }
     .admin-page form h3 {
       font-size: 50px;
       font-weight: 400;
@@ -229,22 +230,6 @@
       line-height: 20px;
       letter-spacing: 0em;
       margin-bottom: 45px; }
-    .admin-page form p {
-      font-weight: 500; }
-      .admin-page form p span {
-        position: relative;
-        cursor: pointer;
-        transition: color 0.3s ease-in-out; }
-        .admin-page form p span::after {
-          position: absolute;
-          content: "";
-          width: 100%;
-          height: 1px;
-          background-color: black;
-          top: 100%;
-          left: 0; }
-        .admin-page form p span:hover {
-          color: #00b894; }
     .admin-page form .invalid {
       color: red;
       margin-top: 10px; }
@@ -362,6 +347,8 @@
     .profile-page form div {
       width: 100%;
       margin-bottom: 30px; }
+      .profile-page form div input[type="text"] {
+        margin-bottom: 0; }
     .profile-page form input {
       width: 100%;
       height: 50px;
@@ -383,22 +370,9 @@
       margin-bottom: 45px; }
     .profile-page form .success {
       color: #169216; }
-    .profile-page form p {
-      font-weight: 500; }
-      .profile-page form p span {
-        position: relative;
-        cursor: pointer;
-        transition: color 0.3s ease-in-out; }
-        .profile-page form p span::after {
-          position: absolute;
-          content: "";
-          width: 100%;
-          height: 1px;
-          background-color: black;
-          top: 100%;
-          left: 0; }
-        .profile-page form p span:hover {
-          color: #00b894; }
+    .profile-page form .invalid {
+      color: red;
+      margin-top: 10px; }
 
 * {
   font-family: "Manrope"; }
