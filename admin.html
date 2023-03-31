@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>Admin</title>
     <link rel="stylesheet" href="dist/css/main.css">
     <link rel="icon" type="image/x-icon" href="dist/images/cloudy.png">
 </head>
@@ -28,27 +28,32 @@
             </div>
         </div>
     </header>
-    <main class="profile-page">
+    <main class="admin-page">
         <div class="container">
-            <form name="profileForm">
-                <h3>User Profile</h3>
-                <div class="file">
-                    <input type="file" name="file">
-                    <img src="dist/images/profile.png" alt="user-logo">
-                </div>
-                <input type="text" name="name" placeholder="Name" />
-                <input type="text" name="sureName" placeholder="SurName" />
+            <form name="adminForm">
+                <h3>Add new user</h3>
                 <div class="email">
                     <input type="email" name="email" placeholder="Email" />
                 </div>
                 <div class="password">
-                    <input type="text" name="password" placeholder="Password" />
+                    <input type="password" name="password" placeholder="Password" />
                 </div>
-                <button type="submit" name="submitBtn">Update Profile</button>
+                <button type="submit" name="submitBtn">Create User</button>
                 <p class="error"></p>
                 <p class="success"></p>
             </form>
+            <div class="users-container">
+                <h3>Users List</h3>
+                <div class="users-wrapper">
+                </div>
+            </div>
         </div>
+        <div class="modal">
+            <div class="modal-content">
+                <span class="modal-close"></span>
+                <h4 class="user-title">User Data</h4>
+                <div class="user-info"></div>
+            </div>
     </main>
 </body>
 <script src="https://smtpjs.com/v3/smtp.js">

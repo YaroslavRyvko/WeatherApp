@@ -8,3 +8,14 @@
   max-width: 1200px;
   width: 100%;
 }
+
+.toast.displayed{
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  background-color: #2ecc71;
+  color: white;
+  border-radius: 5px;
+  padding: 20px;
+  height: fit-content;
+}
