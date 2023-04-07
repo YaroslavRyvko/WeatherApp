@@ -44,6 +44,37 @@
       margin-bottom: 45px;
     }
 
+    .file {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      input {
+        background: none;
+        width: auto;
+        height: auto;
+        padding: 0;
+      }
+
+      img {
+        width: 75px;
+        height: 75px;
+      }
+    }
+
+    input[type="text"] {
+      margin-bottom: 30px;
+    }
+    .checkbock{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
     .invalid {
       color: red;
       margin-top: 10px;

@@ -68,12 +68,17 @@
   display: flex;
   justify-content: center;
   padding: 100px 20px; }
+  .home-page .filter-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    margin-bottom: 100px; }
   .home-page .search {
     display: flex;
     justify-content: center;
     max-width: 500px;
     width: 100%;
-    margin-bottom: 100px;
     position: relative; }
     .home-page .search-input {
       width: 100%;
@@ -89,6 +94,21 @@
       right: 20px;
       background: transparent;
       position: absolute; }
+  .home-page .location-btn {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+    border: 1px solid black;
+    background-color: transparent;
+    padding: 15px 30px;
+    border-radius: 2px;
+    height: 60px;
+    text-align: center;
+    transition: all 0.3s ease-in-out; }
+    .home-page .location-btn:hover {
+      background-color: black;
+      color: white;
+      border-color: black; }
   .home-page .city-wrapper {
     width: 100%;
     display: flex;
@@ -230,6 +250,27 @@
       line-height: 20px;
       letter-spacing: 0em;
       margin-bottom: 45px; }
+    .admin-page form .file {
+      display: flex;
+      align-items: center;
+      justify-content: center; }
+      .admin-page form .file input {
+        background: none;
+        width: auto;
+        height: auto;
+        padding: 0; }
+      .admin-page form .file img {
+        width: 75px;
+        height: 75px; }
+    .admin-page form input[type="text"] {
+      margin-bottom: 30px; }
+    .admin-page form .checkbock {
+      display: flex;
+      gap: 10px;
+      align-items: center; }
+      .admin-page form .checkbock input[type="checkbox"] {
+        width: 20px;
+        height: 20px; }
     .admin-page form .invalid {
       color: red;
       margin-top: 10px; }
@@ -346,7 +387,8 @@
         height: 75px; }
     .profile-page form div {
       width: 100%;
-      margin-bottom: 30px; }
+      margin-bottom: 30px;
+      position: relative; }
       .profile-page form div input[type="text"] {
         margin-bottom: 0; }
     .profile-page form input {
@@ -368,6 +410,17 @@
       line-height: 20px;
       letter-spacing: 0em;
       margin-bottom: 45px; }
+    .profile-page form .password-btn {
+      width: 20px;
+      height: 20px;
+      background-image: url(../images/d58934fe7377dcd53e3e07dbfc05e71d.png);
+      background-size: cover;
+      position: absolute;
+      right: 25px;
+      top: 15px;
+      cursor: pointer; }
+    .profile-page form .password-btn.active {
+      background-image: url(../images/e68fd803889384084270f7d71fea6e38.png); }
     .profile-page form .success {
       color: #169216; }
     .profile-page form .invalid {

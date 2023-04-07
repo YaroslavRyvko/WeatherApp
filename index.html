@@ -25,7 +25,7 @@
             </a>
             <div class="header__nav">
                 <a href="/WeatherApp/profile.html" class="profile-link">
-                    <img src="dist/images/profile.png" alt="">
+                    <img src="dist/images/profile.png" class="profile-img" alt="profile-img">
                 </a>
                 <button class="btn-logout">Logout</button>
             </div>
@@ -33,18 +33,22 @@
     </header>
     <main class="home-page">
         <div class="container">
-            <form class="search">
-                <input type="text" class="search-input" name="search" placeholder="Search city">
-                <button>
-                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M9.89204 14.6351C12.8177 14.6351 15.1893 12.2635 15.1893 9.33784C15.1893 6.41221 12.8177 4.04053 9.89204 4.04053C6.96641 4.04053 4.59473 6.41221 4.59473 9.33784C4.59473 12.2635 6.96641 14.6351 9.89204 14.6351Z"
-                            stroke="#171717" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M16.5142 15.9595L13.6338 13.0791" stroke="#171717" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>
-                </button>
-            </form>
+            <div class="filter-wrapper">
+                <form class="search">
+                    <input type="text" class="search-input" name="search" placeholder="Search city">
+                    <button>
+                        <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M9.89204 14.6351C12.8177 14.6351 15.1893 12.2635 15.1893 9.33784C15.1893 6.41221 12.8177 4.04053 9.89204 4.04053C6.96641 4.04053 4.59473 6.41221 4.59473 9.33784C4.59473 12.2635 6.96641 14.6351 9.89204 14.6351Z"
+                                stroke="#171717" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            </path>
+                            <path d="M16.5142 15.9595L13.6338 13.0791" stroke="#171717" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </button>
+                </form>
+                <button class="location-btn">Get weather from my location</button>
+            </div>
             <div class="city-wrapper"></div>
         </div>
         <div class="modal">

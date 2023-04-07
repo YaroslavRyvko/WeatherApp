@@ -124,6 +124,40 @@ export function initOpenWeather() {
             .join(' ');
     }
 
+    // Get weather from user location
+    
+    let locationBtn = document.querySelector('.location-btn');
+    locationBtn.addEventListener('click', getLocation);
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(fetchWeatherLocation);
+        } else {
+            console.log('no access')
+        }
+    }
+
+    function fetchWeatherLocation(position) {
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
+        cityWrapper.innerHTML = '';
+
+        fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&appid=9ceb3c3e067e14e0f6b76185c8ce3aee`)
+            .then((resp) => {
+                if (!resp.ok) throw new Error(resp.statusText);
+                return resp.json();
+            }).then((data) => {
+                return fetch(`https://api.openweathermap.org/data/2.5/weather?q=${data[0].name}&appid=${key}&units=${units}&lang=${lang}`);
+            }).then((resp) => {
+                if (!resp.ok) throw new Error(resp.statusText);
+                return resp.json();
+            })
+            .then((data) => {
+                showWeather(data);
+            })
+            .catch(console.err);
+    }
+
     //Initialize modal
     let modal = document.querySelector('.modal');
     let closeBtn = document.querySelector('.modal-close');

@@ -70,6 +70,7 @@ export function initFirebase() {
                     set(ref_database(database, "users/" + userData.uid), {
                         email: email,
                         password: password,
+                        loginCount: 1,
                     }).then(() => {
                         checkAuthState(userData);
                     });
@@ -93,6 +94,9 @@ export function initFirebase() {
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const userData = userCredential.user;
+                    update(ref_database(database, 'users/' + userData.uid), {
+                        loginCount: 1,
+                    })
                     localStorage.setItem('currentUser', JSON.stringify(userData));
                     checkAuthState(userData);
                 })
@@ -196,6 +200,8 @@ export function initFirebase() {
             e.preventDefault();
             let email = adminForm.email.value;
             let password = adminForm.password.value;
+            let name = adminForm.name.value;
+            let surName = adminForm.surName.value;
             if (!validation(adminForm, email, password)) return;
 
             createUserWithEmailAndPassword(auth, email, password)
@@ -286,6 +292,7 @@ export function initFirebase() {
                     <img src="${snapshot.val().image || 'dist/images/profile.png'}" alt="user Logo"> 
                     <p>Name: ${snapshot.val().name || 'Not Stated'}</p>
                     <p>SurName: ${snapshot.val().sureName || 'Not Stated'}</p>
+                    <p>Login Count: ${snapshot.val().loginCount || 'Not Stated'}</p>
                     <p>Email adress: ${snapshot.val().email}</p>
                     <p>Password: ${snapshot.val().password}</p>`;
             } else {
@@ -336,6 +343,7 @@ export function initFirebase() {
             profileForm.sureName.value = user.sureName || '';
             profileForm.querySelector('img').src = user.image || 'dist/images/profile.png';
         }
+        document.querySelector('.profile-img').src = user.image || 'dist/images/profile.png';
     }
 
     //Validation
@@ -374,6 +382,19 @@ export function initFirebase() {
         })
     }
 
+    let passwordBtn = document.querySelector('.password-btn');
+    if (passwordBtn) {
+        passwordBtn.addEventListener('click', (e) => {
+            e.target.classList.toggle('active');
+            if (profileForm.password.type == "password") {
+                profileForm.password.type = "text";
+            } else {
+                profileForm.password.type = "password";
+            }
+
+        })
+    }
+
     //Modal 
     let modal = document.querySelector('.modal');
     let closeBtn = document.querySelector('.modal-close');
@@ -389,4 +410,5 @@ export function initFirebase() {
             modal.style.display = "none";
         }
     }
+
 }
