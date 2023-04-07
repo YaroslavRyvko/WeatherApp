@@ -23,10 +23,15 @@
   }
 
   .profile-link {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     display: block;
-    flex-shrink: 0;
+  }
+  
+  .admin-link {
+    width: 50px;
+    height: 50px;
+    display: none;
   }
 
   .btn-logout {

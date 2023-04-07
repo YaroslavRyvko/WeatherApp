@@ -373,16 +373,18 @@
       font-size: 50px;
       font-weight: 400;
       margin-bottom: 50px; }
-    .profile-page form .file {
+    .profile-page form .file .success {
+      text-align: center; }
+    .profile-page form .file .file-flex {
       display: flex;
       align-items: center;
       justify-content: center; }
-      .profile-page form .file input {
+      .profile-page form .file .file-flex input {
         background: none;
         width: auto;
         height: auto;
         padding: 0; }
-      .profile-page form .file img {
+      .profile-page form .file .file-flex img {
         width: 75px;
         height: 75px; }
     .profile-page form div {
@@ -409,7 +411,9 @@
       font-weight: 600;
       line-height: 20px;
       letter-spacing: 0em;
-      margin-bottom: 45px; }
+      margin-bottom: 30px; }
+    .profile-page form .delete-btn {
+      background: #d42a2a; }
     .profile-page form .password-btn {
       width: 20px;
       height: 20px;
@@ -422,7 +426,8 @@
     .profile-page form .password-btn.active {
       background-image: url(../images/e68fd803889384084270f7d71fea6e38.png); }
     .profile-page form .success {
-      color: #169216; }
+      color: #169216;
+      margin-top: 10px; }
     .profile-page form .invalid {
       color: red;
       margin-top: 10px; }
@@ -527,10 +532,13 @@ img {
     align-items: center;
     gap: 50px; }
   .header .profile-link {
-    width: 40px;
-    height: 40px;
-    display: block;
-    flex-shrink: 0; }
+    width: 50px;
+    height: 50px;
+    display: block; }
+  .header .admin-link {
+    width: 50px;
+    height: 50px;
+    display: none; }
   .header .btn-logout {
     font-weight: 600;
     font-size: 15px;

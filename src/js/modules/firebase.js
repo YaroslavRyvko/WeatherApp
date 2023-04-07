@@ -7,6 +7,7 @@ import {
     ref as ref_database,
     get,
     child,
+    runTransaction,
     update
 } from "firebase/database";
 import {
@@ -16,6 +17,7 @@ import {
     signInWithEmailAndPassword,
     updatePassword,
     signOut,
+    deleteUser
 } from "firebase/auth";
 import {
     getStorage,
@@ -66,12 +68,12 @@ export function initFirebase() {
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const userData = userCredential.user;
-                    localStorage.setItem('currentUser', JSON.stringify(userData));
                     set(ref_database(database, "users/" + userData.uid), {
                         email: email,
                         password: password,
                         loginCount: 1,
                     }).then(() => {
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
                         checkAuthState(userData);
                     });
                 })
@@ -94,11 +96,13 @@ export function initFirebase() {
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const userData = userCredential.user;
-                    update(ref_database(database, 'users/' + userData.uid), {
-                        loginCount: 1,
+                    const fieldRef = ref_database(database, 'users/' + userData.uid + '/loginCount');
+                    runTransaction(fieldRef, (currentValue) => {
+                        return (currentValue || 0) + 1;
+                    }).then(() => {
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        checkAuthState(userData);
                     })
-                    localStorage.setItem('currentUser', JSON.stringify(userData));
-                    checkAuthState(userData);
                 })
                 .catch((error) => {
                     const errorMessage = error.message;
@@ -115,7 +119,7 @@ export function initFirebase() {
             e.preventDefault();
             signOut(auth).then(() => {
                 localStorage.removeItem('currentUser');
-                localStorage.removeItem('admin');
+                localStorage.removeItem('adminConfig');
                 checkAuthState();
             }).catch((error) => {
                 console.log(error);
@@ -130,69 +134,83 @@ export function initFirebase() {
             let email = profileForm.email.value;
             let password = profileForm.password.value;
             let name = profileForm.name.value;
-            let sureName = profileForm.sureName.value;
+            let surName = profileForm.surName.value;
             if (!validation(profileForm, email, password)) return;
 
             get(child(dbRef, 'users/' + currentUser.uid)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    if (snapshot.val().email != email) {
-                        updateEmail(auth.currentUser, email).then(() => {
+                    if (snapshot.exists()) {
+                        if (snapshot.val().email != email) {
+                            updateEmail(auth.currentUser, email).then(() => {
+                                update(ref_database(database, 'users/' + currentUser.uid), {
+                                    email: email
+                                }).then(() => {
+                                    fieldUpdateMessage(profileForm, 'email');
+                                    getUserInfo(currentUser.uid);
+                                })
+                            }).catch((error) => {
+                                console.log(error);
+                            });
+                        }
+                        if (snapshot.val().password != password) {
+                            updatePassword(auth.currentUser, password).then(() => {
+                                update(ref_database(database, 'users/' + currentUser.uid), {
+                                    password: password
+                                }).then(() => {
+                                    fieldUpdateMessage(profileForm, 'password');
+                                    getUserInfo(currentUser.uid);
+                                })
+                            }).catch((error) => {
+                                console.log(error);
+                            });
+                        }
+                        if (snapshot.val().name != name) {
                             update(ref_database(database, 'users/' + currentUser.uid), {
-                                email: email
+                                name: name
+                            }).then(() => {
+                                fieldUpdateMessage(profileForm, 'name');
+                                getUserInfo(currentUser.uid);
                             })
-                        }).catch((error) => {
-                            console.log(error);
-                        });
-                    }
-                    if (snapshot.val().password != password) {
-                        updatePassword(auth.currentUser, password).then(() => {
+                        }
+                        if (snapshot.val().surName != surName) {
                             update(ref_database(database, 'users/' + currentUser.uid), {
-                                password: password
+                                surName: surName
+                            }).then(() => {
+                                fieldUpdateMessage(profileForm, 'surName');
+                                getUserInfo(currentUser.uid);
                             })
-                        }).catch((error) => {
-                            console.log(error);
-                        });
+                        }
+                    } else {
+                        console.log("No data available");
                     }
-                    if (snapshot.val().name != name) {
-                        update(ref_database(database, 'users/' + currentUser.uid), {
-                            name: name
-                        })
-                    }
-                    if (snapshot.val().sureName != sureName) {
-                        update(ref_database(database, 'users/' + currentUser.uid), {
-                            sureName: sureName
-                        })
-                    }
-                } else {
-                    console.log("No data available");
-                }
-            }).then(() => {
-                profileForm.querySelector('.success').textContent = 'Profile was updated Successfully';
-                setTimeout(() => {
-                    profileForm.querySelector('.success').textContent = ''
-                }, 3000);
-            }).catch((error) => {
-                console.log(error);
-            });
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
 
             if (file) updateImage(file);
         });
+
+        profileForm.deleteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            deleteUser(auth.currentUser).then(() => {
+                signOut(auth).then(() => {
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('admin');
+                    checkAuthState();
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }).catch((error) => {
+                console.log(error);
+            });
+        })
     }
 
-    function updateImage(newfile) {
-        const storage = getStorage();
-        const name = +new Date() + "-" + newfile.name;
-        const storageRef = ref_storage(storage, name);
-
-        uploadBytes(storageRef, newfile).then((snapshot) => {
-            getDownloadURL(snapshot.ref).then(url => {
-                update(ref_database(database, 'users/' + currentUser.uid), {
-                    image: url,
-                }).then(() => {
-                    getUserInfo(currentUser.uid);
-                })
-            });
-        });
+    function fieldUpdateMessage(form, field) {
+        form.querySelector(`.${field}`).innerHTML += `<p class="success">Your ${field} was updated successfully</p>`;
+        setTimeout(() => {
+            form.querySelector(`.${field}`).querySelector('.success').remove();
+        }, 3000);
     }
 
     if (adminForm) {
@@ -202,41 +220,53 @@ export function initFirebase() {
             let password = adminForm.password.value;
             let name = adminForm.name.value;
             let surName = adminForm.surName.value;
+            let file = adminForm.file.files[0];
+            let isAdmin = adminForm.checkAdmin.checked;
             if (!validation(adminForm, email, password)) return;
 
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const userData = userCredential.user;
+                    if (file) updateImage(file, userData);
                     set(ref_database(database, "users/" + userData.uid), {
                         email: email,
                         password: password,
-                    }).then(() => {
-                        getUsers();
-                        adminForm.querySelector('.success').textContent = 'User added Successfully';
-                        adminForm.querySelector('.error').textContent = '';
-                        setTimeout(() => {
-                            adminForm.querySelector('.success').textContent = ''
-                        }, 3000);
-
-                        Email.send({
-                            Host: "smtp.elasticemail.com",
-                            Username: "weatherappjs@gmail.com",
-                            Password: "8126751B8E3A5C350BB969B7C8E434E74F36",
-                            To: email,
-                            From: "weatherappjs@gmail.com",
-                            Subject: "Registration Success",
-                            Body: "Congratz your account was created on https://yaroslavryvko.github.io/WeatherApp"
-                        }).then(
-                            message => console.log(message)
-                        );
-                    });
+                        name: name,
+                        surName: surName,
+                        admin: isAdmin
+                    })
+                })
+                .then(() => {
+                    signInWithEmailAndPassword(
+                        auth,
+                        JSON.parse(localStorage.getItem('adminConfig')).email,
+                        JSON.parse(localStorage.getItem('adminConfig')).password
+                    );
+                    getUsers();
+                    Email.send({
+                        Host: "smtp.elasticemail.com",
+                        Username: "weatherappjs@gmail.com",
+                        Password: "8126751B8E3A5C350BB969B7C8E434E74F36",
+                        To: email,
+                        From: "weatherappjs@gmail.com",
+                        Subject: "Registration Success",
+                        Body: "Congratz your account was created on https://yaroslavryvko.github.io/WeatherApp"
+                    }).then(
+                        message => console.log(message)
+                    );
                 })
                 .catch((error) => {
                     const errorMessage = error.message;
                     adminForm.querySelector('.error').textContent = errorMessage;
                 });
 
+            adminForm.email.value = '';
             adminForm.password.value = '';
+            adminForm.surName.value = '';
+            adminForm.name.value = '';
+            adminForm.password.value = '';
+            adminForm.file.value = '';
+            adminForm.checkAdmin.checked = false;
         });
     }
 
@@ -291,10 +321,11 @@ export function initFirebase() {
                 userInfo.innerHTML = ` 
                     <img src="${snapshot.val().image || 'dist/images/profile.png'}" alt="user Logo"> 
                     <p>Name: ${snapshot.val().name || 'Not Stated'}</p>
-                    <p>SurName: ${snapshot.val().sureName || 'Not Stated'}</p>
-                    <p>Login Count: ${snapshot.val().loginCount || 'Not Stated'}</p>
+                    <p>SurName: ${snapshot.val().surName || 'Not Stated'}</p>
+                    <p>Login Count: ${snapshot.val().loginCount || 0}</p>
                     <p>Email adress: ${snapshot.val().email}</p>
-                    <p>Password: ${snapshot.val().password}</p>`;
+                    <p>Password: ${snapshot.val().password}</p>
+                    <p>Admin: ${snapshot.val().admin}</p>`;
             } else {
                 console.log("No data available");
             }
@@ -303,10 +334,35 @@ export function initFirebase() {
         });
     }
 
+    function updateImage(newfile, newUser) {
+        const storage = getStorage();
+        const name = +new Date() + "-" + newfile.name;
+        const storageRef = ref_storage(storage, name);
+
+        uploadBytes(storageRef, newfile).then((snapshot) => {
+            getDownloadURL(snapshot.ref).then(url => {
+                if (newUser) {
+                    update(ref_database(database, 'users/' + newUser.uid), {
+                        image: url,
+                    }).then(() => {
+                        getUsers();
+                    })
+                } else {
+                    update(ref_database(database, 'users/' + currentUser.uid), {
+                        image: url,
+                    }).then(() => {
+                        fieldUpdateMessage(profileForm, 'file');
+                        getUserInfo(currentUser.uid);
+                    })
+                }
+            });
+        });
+    }
+
     // Auth State
     function checkAuthState(user) {
         if (user) {
-            if (window.location.href.includes('/admin.html') && !localStorage.getItem('admin')) {
+            if (window.location.href.includes('/admin.html') && !localStorage.getItem('adminConfig')) {
                 window.location.replace(newPath);
             }
             if (window.location.href.includes('/auth.html')) {
@@ -324,7 +380,15 @@ export function initFirebase() {
         get(child(dbRef, 'users/' + uid)).then((snapshot) => {
             if (snapshot.exists()) {
                 if (snapshot.val().admin === true) {
-                    localStorage.setItem('admin', true);
+                    localStorage.setItem('adminConfig', JSON.stringify({
+                        admin: true,
+                        password: snapshot.val().password,
+                        email: snapshot.val().email,
+                    }));
+                    let adminImage = document.querySelector('.admin-link');
+                    if (adminImage && localStorage.getItem('adminConfig')) {
+                        adminImage.style.display = 'block';
+                    }
                 }
                 initUserProfile(snapshot.val());
             } else {
@@ -335,15 +399,19 @@ export function initFirebase() {
         });
     }
 
-    function initUserProfile(user) {
+    function initUserProfile(userData) {
         if (profileForm) {
-            profileForm.email.value = user.email;
-            profileForm.password.value = user.password;
-            profileForm.name.value = user.name || '';
-            profileForm.sureName.value = user.sureName || '';
-            profileForm.querySelector('img').src = user.image || 'dist/images/profile.png';
+            profileForm.email.value = userData.email;
+            profileForm.password.value = userData.password;
+            profileForm.name.value = userData.name || '';
+            profileForm.surName.value = userData.surName || '';
+            profileForm.querySelector('img').src = userData.image || 'dist/images/profile.png';
         }
-        document.querySelector('.profile-img').src = user.image || 'dist/images/profile.png';
+
+        let userImage = document.querySelector('.profile-img');
+        if (userImage) {
+            userImage.src = userData.image || 'dist/images/profile.png';
+        }
     }
 
     //Validation
@@ -354,13 +422,15 @@ export function initFirebase() {
         if (!email) {
             form.querySelector('.email').innerHTML += '<p class="invalid">This field is required</p>';
             errorCheck = false;
-
         } else if (!/^\S+@\S+\.\S+$/.test(email)) {
             form.querySelector('.email').innerHTML += '<p class="invalid">Invalid email adress</p>';
             errorCheck = false;
         }
         if (!password) {
             form.querySelector('.password').innerHTML += '<p class="invalid">This field is required</p>'
+            errorCheck = false;
+        } else if (password.length < 6) {
+            form.querySelector('.password').innerHTML += '<p class="invalid">Password is too short</p>'
             errorCheck = false;
         }
         return errorCheck;
@@ -384,15 +454,14 @@ export function initFirebase() {
 
     let passwordBtn = document.querySelector('.password-btn');
     if (passwordBtn) {
-        passwordBtn.addEventListener('click', (e) => {
+        passwordBtn.onclick = function (e) {
             e.target.classList.toggle('active');
             if (profileForm.password.type == "password") {
                 profileForm.password.type = "text";
             } else {
                 profileForm.password.type = "password";
             }
-
-        })
+        }
     }
 
     //Modal 

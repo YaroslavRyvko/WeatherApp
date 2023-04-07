@@ -33,11 +33,17 @@
             <form name="profileForm">
                 <h3>User Profile</h3>
                 <div class="file">
-                    <input type="file" name="file">
-                    <img src="dist/images/profile.png" alt="user-logo">
+                    <div class="file-flex">
+                        <input type="file" name="file">
+                        <img src="dist/images/profile.png" alt="user-logo">
+                    </div>
                 </div>
-                <input type="text" name="name" placeholder="Name" />
-                <input type="text" name="sureName" placeholder="SurName" />
+                <div class="name">
+                    <input type="text" name="name" placeholder="Name" />
+                </div>
+                <div class="surName">
+                    <input type="text" name="surName" placeholder="SurName" />
+                </div>
                 <div class="email">
                     <input type="email" name="email" placeholder="Email" />
                 </div>
@@ -46,6 +52,7 @@
                     <div class="password-btn"></div>
                 </div>
                 <button type="submit" name="submitBtn">Update Profile</button>
+                <button type="submit" class="delete-btn" name="deleteBtn">Delete Profile</button>
                 <p class="error"></p>
                 <p class="success"></p>
             </form>
