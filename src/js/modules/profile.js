@@ -6,6 +6,7 @@ import {
     ref as ref_database,
     get,
     update,
+    remove
 } from "firebase/database";
 import {
     getAuth,
