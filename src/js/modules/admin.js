@@ -229,6 +229,7 @@ export function initAdmin() {
                             iterations = 0;
                             loadUsers(5);
                             loadMoreBtn.style.display = "block";
+                            modal.style.display = "none";
                         });
                     })
                     .catch(error => {
