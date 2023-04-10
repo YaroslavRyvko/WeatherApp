@@ -284,6 +284,8 @@
     margin-top: 20px;
     padding: 20px;
     width: 100%;
+    height: -moz-fit-content !important;
+    height: fit-content !important;
     height: 500px;
     display: flex;
     flex-direction: column;
@@ -343,6 +345,13 @@
     display: block; }
   .admin-page .user-info p {
     margin-bottom: 10px; }
+  .admin-page .user-info .delete-button {
+    padding: 10px 30px;
+    background-color: #ca1e1e;
+    color: white;
+    border-radius: 5px;
+    margin: 15px auto;
+    display: block; }
   .admin-page .modal-close {
     position: absolute;
     right: 20px;
@@ -352,6 +361,8 @@
     height: 20px;
     background-size: contain;
     background-image: url(../images/b2d6a4de1d7e823720981b2d9777d661.png); }
+  .admin-page .loadMore-btn {
+    padding: 15px 30px; }
 
 @media screen and (max-width: 768px) {
   .admin-page {
@@ -428,6 +439,9 @@
     .profile-page form .success {
       color: #169216;
       margin-top: 10px; }
+    .profile-page form .error {
+      color: red;
+      text-align: center; }
     .profile-page form .invalid {
       color: red;
       margin-top: 10px; }
